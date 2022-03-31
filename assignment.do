@@ -59,7 +59,7 @@ kdensity r, normal
 *Checking Homoskedasticity of Residuals
 rvfplot, yline(0)
 
-* !!! not sure about how this commands work
+* !!! not sure about how these commands work
 estat imtest, white
 estat hettest
 
