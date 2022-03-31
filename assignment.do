@@ -1,5 +1,8 @@
 drop _all
 
-use "dataset path here"
+*importing data and saving in dta format
+import excel "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset\DataSet.xlsx", sheet("DataSet") cellrange (B1:O135) firstrow
 
-save assignment, replace
+cd "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset"
+
+save assginment, replace
