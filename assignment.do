@@ -64,7 +64,7 @@ hist free, kden name(hist7, replace)
 
 hist pol, name(hist8, replace) discrete
 
-*this variable will be the education
+*this variable will be the education when Djordje update the dataset we generate this graph
 hist hdi, kden name(hist9, replace)
 
 
