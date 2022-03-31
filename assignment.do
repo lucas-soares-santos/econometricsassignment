@@ -7,7 +7,68 @@ cd "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignme
 
 save assignment, replace
 
+sum _all
 
+
+rename Lifesatisfaction lifesat
+rename LoggedGDPpercapita gdppc
+rename Healthylifeexpectancy lifexp
+rename Generosity gnr
+rename Perceptionsofcorruption corru
+rename Socialsupport socsup
+rename Freedomtomakelifechoices free
+rename Politics pol
+rename HumanDevelopmentIndex hdi
+
+
+*generating gdp level to compare
+gen gdplvl = exp(gdppc) 
+label variable gdplvl "GDP per capita in level"
+
+
+
+***************************
+*  DESCRIPTIVE STATISTICS *
+***************************
+
+
+*HISTOGRAMS AND GRAPHS 
+
+*gdp variables
+hist gdplvl, kden name(hist0, replace)
+
+hist gdppc, kden name(hist1, replace)
+
+graph combine hist0 hist1
+
+
+
+*first set of variables
+hist lifesat, kden name(hist2, replace)
+
+hist lifexp, kden name(hist3, replace)
+
+hist gnr, kden name(hist4, replace)
+
+hist corru, kden name(hist5, replace)
+
+
+graph combine hist2 hist3 hist4 hist5
+
+
+
+*second set of variables
+hist socsup, kden name(hist6, replace)
+
+hist free, kden name(hist7, replace)
+
+hist pol, name(hist8, replace) discrete
+
+*this variable will be the education
+hist hdi, kden name(hist9, replace)
+
+
+graph combine hist6 hist7 hist8 hist9
 
 * ########### Tomas 31/03 #############
 * Basically I chose three explanatory variables and I played with them, until the heterokedasticity part
