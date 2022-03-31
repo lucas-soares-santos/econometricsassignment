@@ -5,4 +5,4 @@ import excel "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometric
 
 cd "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset"
 
-save assginment, replace
+save assignment, replace
