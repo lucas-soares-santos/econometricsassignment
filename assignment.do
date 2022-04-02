@@ -124,4 +124,50 @@ rvfplot, yline(0)
 estat imtest, white
 estat hettest
 
+******************************************************* update 02/04/22 **************************************
+*******************************************************                 **************************************
+generate logpop=log(Populationdensity)
+generate logune=log(Unemployment)
+*generate logsch=log(Averagetotalyearsofschooling)
+generate logstr=log(Covidpolicymeanstringencyind/Populationdensity)
+generate logstr2=log(Covidpolicymaximumstringency/Populationdensity)
+generate logcases=log(Covidcasestotal/Populationdensity)
+
+
+*second set of variables
+hist Giniinequalityindex2019, kden name(hist6, replace)
+hist Unemployment, kden name(hist7, replace)
+hist Populationdensity,kden name(hist8, replace) 
+*hist logune, kden name(hist7, replace)
+*hist logpop,kden name(hist8, replace) 
+hist Averagetotalyearsofschooling, kden name(hist9, replace)
+*hist logsch, kden name(hist9, replace)
+graph combine hist6 hist7 hist8 hist9
+
+
+* multiple tries to check the models
+reg  Lifesatisfaction LoggedGDPpercapita Freedomtomakelifechoices Socialsupport Giniinequalityindex2019 logune Perceptionsofcorruption pol1 pol2 pol3
+
+
+
+******************************************** First model *******************************
+
+
+
+reg  Lifesatisfaction HumanDevelopmentIndex Freedomtomakelifechoices Socialsupport Giniinequalityindex2019 logune Perceptionsofcorruption
+vif
+
+*model adding dummy variables
+reg  Lifesatisfaction HumanDevelopmentIndex Freedomtomakelifechoices Socialsupport Giniinequalityindex2019 logune Perceptionsofcorruption pol3
+
+vif
+*********************************************
+
+
+
+
+
+
+
+
 
