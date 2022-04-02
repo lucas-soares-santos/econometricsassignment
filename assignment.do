@@ -18,12 +18,59 @@ rename Perceptionsofcorruption corru
 rename Socialsupport socsup
 rename Freedomtomakelifechoices free
 rename Politics pol
+rename Covidpolicymaximumstringency covidmax
+rename Covidpolicymeanstringencyind covidmean
+rename Covidcasestotal covidtotal
+rename Coviddeathstotal covideaths
+rename Populationdensity denpop
+rename Unemploymenttotaloftotal unemp
+rename Giniinequalityindex gini
+rename Averagetotalyearsofschooling school
+rename Populationsize pop
 rename HumanDevelopmentIndex hdi
+
 
 
 *generating gdp level to compare
 gen gdplvl = exp(gdppc) 
 label variable gdplvl "GDP per capita in level"
+
+
+************** COVID ****************************************************
+
+gen totcovid = covidtotal/pop
+gen deathscovid = covideaths/pop
+
+gen ltotcov = log(totcovid)
+gen ldeathcov = log(deathscovid)
+gen lcovmax = log(covidmax)
+gen lcovmean = log(covidmean)
+
+
+graph matrix lifesat totcovid deathscovid covidmax covidmean
+
+graph matrix lifesat ltotcov ldeathcov lcovmax lcovmean
+
+
+reg lifesat totcovid deathscovid covidmax covidmean
+vif
+
+
+reg lifesat ltotcov ldeathcov lcovmax lcovmean
+vif
+
+***********************************************************************
+
+
+
+
+
+
+
+
+
+
+
 
 
 
