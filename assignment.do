@@ -171,44 +171,136 @@ rvfplot, yline(0)
 estat imtest, white
 estat hettest
 
-******************************************************* update 02/04/22 **************************************
-*******************************************************                 **************************************
-generate logpop=log(Populationdensity)
-generate logune=log(Unemployment)
-*generate logsch=log(Averagetotalyearsofschooling)
-generate logstr=log(Covidpolicymeanstringencyind/Populationdensity)
-generate logstr2=log(Covidpolicymaximumstringency/Populationdensity)
-generate logcases=log(Covidcasestotal/Populationdensity)
+******************************************************* update 02/04/22 ***********************************************
+*******************************************************         we did it        **************************************
+
+clear all
+import excel "C:\Users\tomso\Downloads\DataSet3.xlsx", sheet("DataSet3") firstrow
+
+describe
+
+rename Lifesatisfaction lifesat
+rename LoggedGDPpercapita gdppc
+rename Healthylifeexpectancy lifexp
+rename Generosity gnr
+rename Perceptionsofcorruption corru
+rename Socialsupport socsup
+rename Freedomtomakelifechoices free
+rename Politics pol
+rename Covidpolicymaximumstringency covidmax
+rename Covidpolicymeanstringencyind covidmean
+rename Covidcasestotal covidtotal
+rename Coviddeathstotal covideaths
+rename Populationdensity denpop
+rename Unemploymenttotaloftotal unemp
+rename Giniinequalityindex gini
+rename Averagetotalyearsofschooling school
+rename Populationsize pop
+rename HumanDevelopmentIndex hdi
+
+gen totcovid = covidtotal/pop
+gen deathscovid = covideaths/pop
+
+gen ltotcov = log(totcovid)
+gen ldeathcov = log(deathscovid)
+gen lcovmax = log(covidmax)
+gen lcovmean = log(covidmean)
+gen lune=log(unemp)
+
+ 
+gen pol1=0
+replace pol1=1 if pol==1 
+gen pol2=0
+replace pol2=1 if pol==2  
+replace pol3=0
+replace pol3=1 if pol==3 
 
 
-*second set of variables
-hist Giniinequalityindex2019, kden name(hist6, replace)
-hist Unemployment, kden name(hist7, replace)
-hist Populationdensity,kden name(hist8, replace) 
-*hist logune, kden name(hist7, replace)
-*hist logpop,kden name(hist8, replace) 
-hist Averagetotalyearsofschooling, kden name(hist9, replace)
-*hist logsch, kden name(hist9, replace)
-graph combine hist6 hist7 hist8 hist9
-
-
-* multiple tries to check the models
-reg  Lifesatisfaction LoggedGDPpercapita Freedomtomakelifechoices Socialsupport Giniinequalityindex2019 logune Perceptionsofcorruption pol1 pol2 pol3
 
 
 
-******************************************** First model *******************************
+******* 1 thing
+graph matrix lifesat hdi free socsup gini lune corru  gdppc lifexp gnr school denpop   pol3 totcovid deathscovid covidmax covidmean 
 
+******* 2 thing (make logs before)
 
+reg   lifesat hdi free socsup gini lune corru  gdppc lifexp gnr school denpop ltotcov pol1 pol2 pol3 ldeathcov lcovmax lcovmean 
+****** 3 thing
+*heterokesdaticity, due to heterokesdaticity we cannot drop variables
+estat imtest, white
+estat hettest
+*with all independent variablesles
+hettest, rhs 
+*multivollinearity
+vif  
 
-reg  Lifesatisfaction HumanDevelopmentIndex Freedomtomakelifechoices Socialsupport Giniinequalityindex2019 logune Perceptionsofcorruption
+*drop gdp, schooling,lifeexpectancy,covid deaths
+*merging politics in two catgepries tp avoid multivollinearity
+gen pol3=0
+replace pol3=1 if pol==3 
+replace pol3=1 if pol==2
+
+*we run regre again
+reg lifesat gdppc free socsup gini lune corru ldeathcov pol3 gnr denpop covidmean
 vif
 
-*model adding dummy variables
-reg  Lifesatisfaction HumanDevelopmentIndex Freedomtomakelifechoices Socialsupport Giniinequalityindex2019 logune Perceptionsofcorruption pol3
 
+*outilers/influential
+
+predict r, rstudent
+
+
+* see the distribution
+stem r
+*looking carefully the ones with std residual > 2
+
+list r lifesat gdppc free socsup gini lune corru ldeathcov pol3 gnr denpop covidmean Country if abs(r) > 3
+
+
+*Conditional fits to check outliers visually (another way)
+avplots
+
+*check leverage
+*leverage: identify observations with great influence on the regression coefficient estimates
+predict lev, leverage
+stem lev
+* a point with leverage greater than (2k+2)/n should be carefully examined. Here k is the number of predictors and n is the number of observations.
+list lifesat gdppc free socsup gini lune corru ldeathcov pol3 gnr denpop covidmean Country if lev >(2*11 +2)/120
+
+lvr2plot, mlabel(Country)
+
+*Now let's move on to overall measures of influence, specifically let's look at Cook's D and DFITS.  These measures both combine information on the residual and leverage. Cook's D and DFITS are very similar except that they scale differently but they give us similar answers.
+*The lowest value that Cook's D can assume is zero, and the higher the Cook's D is, the more influential the point. The convention cut-off point is 4/n
+predict e, cooksd
+list lifesat gdppc free socsup gini lune corru ldeathcov pol3 gnr denpop covidmean Country e if e>4/120
+
+
+*Now let's take a look at DFITS. The cut-off point for DFITS is 2*sqrt(k/n). DFITS can be either positive or negative, with numbers close to zero corresponding to the points with small or zero influence.
+predict efit, dfits
+list lifesat gdppc free socsup gini lune corru ldeathcov pol3 gnr denpop covidmean Country dfit if abs(dfit)>2*sqrt(3/120)
+
+*removing problematic outliers Botswana Rwanda and Myanmar
+
+drop if abs(r)>3
+
+
+*we run regre again
+reg lifesat gdppc free socsup gini lune corru ldeathcov pol3 gnr denpop covidmean
 vif
-*********************************************
+
+*Checking Normality of Residuals
+kdensity r, normal
+
+*Checking Homoscedasticity of Residuals
+rvfplot, yline(0) mlabel(Country)
+estat imtest, white
+hettest, rhs fstat
+
+*final regre droping gini denpop and covidmean because of t stat
+* check the f tests tomorrow
+reg lifesat gdppc free socsup lune corru ldeathcov pol3 
+vif
+
 
 
 
