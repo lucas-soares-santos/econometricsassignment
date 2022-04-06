@@ -1,10 +1,10 @@
 drop _all
 
 *importing data and saving in dta format
-import excel "C:\Users\BANDITO\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset\DataSet3.xlsx", sheet("DataSet3") cellrange(B1:T121) firstrow
+import excel "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset\DataSet3.xlsx", sheet("DataSet3") cellrange(B1:T121) firstrow
 
 
-cd "C:\Users\BANDITO\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset"
+cd "C:\Users\Lucas\Documents\Workarea\QEM Msc\2nd Semester\Econometrics\Assignment\dataset"
 
 save assignment, replace
 
